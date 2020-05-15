@@ -26,7 +26,29 @@ def getCoord(maze, target):
 
 	return (i, j)
 
+def removeJunk(maze, junk):
+	clean_maze = []
+	for line in maze:
+		clean_line = []
+		for block in line:
+			if block == junk:
+				clean_line.append(" ")
+			else:
+				clean_line.append(block)
+		clean_maze.append(clean_line)
+	return clean_maze
+
+def writeSol(filename, solution):
+	with open(filename, "w") as fp:
+		for line in solution:
+			for block in line:
+				fp.write(str(block))
+	return
+
 if __name__ == "__main__":
 	maze = getMaze("maze.txt")
 	end_point = getCoord(maze, "E")
 	start_point = getCoord(maze, "S")
+
+	maze = removeJunk(maze, "U")
+	writeSol("maze_solution.txt", maze)
