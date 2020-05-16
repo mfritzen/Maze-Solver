@@ -1,19 +1,28 @@
+# global variable that is useful for the recursive function
 done = False
 
-def getMaze(filename):
+# this function asks the user for a filename and attempts to opens that
+# file and reads the maze from it (if it exists) 
+def getMaze():
 	
 	maze = []
-
-	with open(filename) as fp:
-		while (1):
-			next_line = fp.readline()
-			next_line.rstrip()
-			if not next_line:
+	while True:
+		try:
+			filename = input("Please enter the filename of the maze you want to solve: ")
+			with open(filename) as fp:
+				while True:
+					next_line = fp.readline()
+					next_line.rstrip()
+					if not next_line:
+						break
+					maze.append(next_line)
 				break
-			maze.append(next_line)
+		except FileNotFoundError:
+			print("Sorry, I couldn't find that file.")
 
-	return maze
+	return (maze, filename)
 
+# this function gets the coordinate of the first instanve of a given character
 def getCoord(maze, target):
 
 	still_going = True
@@ -28,6 +37,7 @@ def getCoord(maze, target):
 
 	return (i, j)
 
+# this function converts the input into a form that is easier to work with
 def makeMazeList(maze):
 	maze_as_list = []
 	for line in maze:
@@ -37,6 +47,9 @@ def makeMazeList(maze):
 		maze_as_list.append(line_as_list)
 	return maze_as_list
 
+# this function handles the first step of the recursion, which is
+# different from the remaining steps because it is the first point
+# and no points in the maze were previously operated on
 def solveMaze(maze, start, end):
 	x = start[1]
 	y = start[0]
@@ -50,8 +63,14 @@ def solveMaze(maze, start, end):
 	# go west
 	maze = solveRecurse(maze, (y, x-1), 3)
 
+	if done == False:
+		print("Sorry :(\nThis maze does not have a solution.")
+
 	return maze
 
+# This is the recusive function. It works through the maze and tries each
+# possible path until it finds on that works. Once it does, it will work
+# backwards from the end point and mark the path back to the start point.
 def solveRecurse(maze, coord, direction):
 	y = coord[0]
 	x = coord[1]
@@ -129,6 +148,8 @@ def solveRecurse(maze, coord, direction):
 		maze[y][x] = path_char
 	return maze
 
+# this function removes some extra stuff that was useful for the
+# recursive function but would make the output look cluttered to the user
 def removeJunk(maze, junk):
 	clean_maze = []
 	for line in maze:
@@ -141,18 +162,25 @@ def removeJunk(maze, junk):
 		clean_maze.append(clean_line)
 	return clean_maze
 
+# this function writes the output to a file
 def writeSol(filename, solution):
 	with open(filename, "w") as fp:
+		if done == False:
+			fp.write("Sorry :(\nThis maze does not have a solution.")
+			return
 		for line in solution:
 			for block in line:
 				fp.write(str(block))
 	return
 
 if __name__ == "__main__":
-	maze = getMaze("maze.txt")
+	user_input = getMaze()
+	maze = user_input[0]
+	filename = user_input[1]
 	end_point = getCoord(maze, "E")
 	start_point = getCoord(maze, "S")
 	maze = makeMazeList(maze)
 	maze = solveMaze(maze, start_point, end_point)
 	maze = removeJunk(maze, "U")
-	writeSol("maze_solution.txt", maze)
+	solution_filename = filename.replace(".txt", "") + "_solution.txt"
+	writeSol(solution_filename, maze)
