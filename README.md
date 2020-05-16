@@ -1,0 +1,2 @@
+# Maze Solver
+This program takes a maze in the form of a `.txt` file as an input and finds a solution to the maze (if one exists). The input maze should be a rextangle with the uppercase letter `X` denoting walls, uppercase letter `S` denoting the starting point, and uppercase letter `E` denoting the ending point. It will create a new `.txt` file with the solution with the path marked by the lowercase letter `o`.
